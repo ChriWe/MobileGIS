@@ -24,21 +24,30 @@ public class MainActivity extends ActionBarActivity {
         mWebView = (WebView)findViewById(R.id.wvPortal);
         mWebView.loadUrl("file:///android_asset/web/index.html");
         mWebView.setWebViewClient(new WebViewClient() {
-
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 view.getContext().startActivity(intent);
                 return true;
             }
-
+        });
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+            }
         });
 
         mWebSettings = mWebView.getSettings();
         mWebSettings.setJavaScriptEnabled(true);
+        mWebSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        mWebSettings.setGeolocationEnabled(true);
+        mWebSettings.setGeolocationDatabasePath( getApplicationContext().getFilesDir().getPath() );
         mWebSettings.setAllowFileAccessFromFileURLs(true);
         mWebSettings.setAllowUniversalAccessFromFileURLs(true);
+        mWebSettings.setAppCacheEnabled(true);
+        mWebSettings.setDatabaseEnabled(true);
+        mWebSettings.setDomStorageEnabled(true);
+
     }
 
     @Override

@@ -17,11 +17,12 @@
     right: 10px;
     background-color: lightgrey;
     padding: 4px;
+    width: 200px;
 }
 
 #locate-button {
     position: absolute;
-    bottom: 70px;
+    bottom: 30px;
     width: 130px;
     left: 10px;
 }

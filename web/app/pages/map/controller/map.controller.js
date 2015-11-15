@@ -8,20 +8,24 @@ define('map', [
 ], function ($) {
     'use strict';
     $(function () {
+        console.log("controller");
+
+        var view = new ol.View({
+            center: ol.proj.transform([0, 0], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 4
+        });
+
         var map = new ol.Map({
             target: 'olMap',
             layers: [
                 new ol.layer.Tile({
-                    source: new ol.source.OSM()
+                    source: new ol.source.MapQuest({layer: 'osm'})
                 }),
-                new ol.layer.Tile({
-                    source: new ol.source.MapQuest({layer: 'sat'})
-                })
+                //new ol.layer.Tile({
+                //    source: new ol.source.MapQuest({layer: 'sat'})
+                //})
             ],
-            view: new ol.View({
-                center: ol.proj.transform([0, 0], 'EPSG:4326', 'EPSG:3857'),
-                zoom: 4
-            }),
+            view: view,
             interactions: ol.interaction.defaults().extend([
                 new ol.interaction.DragRotateAndZoom()
             ]),
@@ -33,208 +37,127 @@ define('map', [
         });
 
 
-// Geolocation marker
-        var markerEl = document.getElementById('geolocation_marker');
-        var marker = new ol.Overlay({
-            positioning: 'center-center',
-            element: markerEl,
-            stopEvent: false
+        // geolocate device
+        var locateEnabled = false;
+        var firstInit = false;
+        $("#info-button").hide();
+        var geolocateBtn = document.getElementById('locate-button');
+        geolocateBtn.addEventListener('click', function () {
+            locateEnabled = !locateEnabled;
+            if (locateEnabled) {
+                $("#locate-button .ui-btn-text").text("Disable");
+                $("#info-button").show();
+            } else {
+                $("#locate-button .ui-btn-text").text("Locate Me!");
+                $("#info-button").hide();
+            }
+
+            firstInit = true;
+            geolocation.setTracking(locateEnabled); // Start position tracking
         });
-        map.addOverlay(marker);
 
-// LineString to store the different geolocation positions. This LineString
-// is time aware.
-// The Z dimension is actually used to store the rotation (heading).
-        var positions = new ol.geom.LineString([],
-            /** @type {ol.geom.GeometryLayout} */ ('XYZM'));
-
-// Geolocation Control
+        // Geolocation Control
         var geolocation = new ol.Geolocation(/** @type {olx.GeolocationOptions} */ ({
             projection: view.getProjection(),
             trackingOptions: {
-                maximumAge: 10000,
-                enableHighAccuracy: true,
-                timeout: 600000
+                //maximumAge: 10000,
+                enableHighAccuracy: true
+                //timeout: 600000
             }
         }));
 
-        var deltaMean = 500; // the geolocation sampling period mean in ms
-
-// Listen to position changes
+        // Listen to position changes
         geolocation.on('change', function (evt) {
             var position = geolocation.getPosition();
+            var altitude = geolocation.getAltitude();
+            var altitudeAccuracy = geolocation.getAltitudeAccuracy();
             var accuracy = geolocation.getAccuracy();
             var heading = geolocation.getHeading() || 0;
             var speed = geolocation.getSpeed() || 0;
             var m = Date.now();
 
-            addPosition(position, heading, m, speed);
-
-            var coords = positions.getCoordinates();
-            var len = coords.length;
-            if (len >= 2) {
-                deltaMean = (coords[len - 1][3] - coords[0][3]) / (len - 1);
-            }
-
             var html = [
-                'Position: ' + position[0].toFixed(2) + ', ' + position[1].toFixed(2),
-                'Accuracy: ' + accuracy,
+                'Position: ' + position[0].toFixed(2) + ', ' + position[1].toFixed(2) + ' [m]',
+                'Altitude: ' + altitude + ' [m]',
+                'Accuracy: ' + 'xy - ' + accuracy + ', h - ' + altitudeAccuracy + ' [m]',
                 'Heading: ' + Math.round(radToDeg(heading)) + '&deg;',
-                'Speed: ' + (speed * 3.6).toFixed(1) + ' km/h',
-                'Delta: ' + Math.round(deltaMean) + 'ms'
+                'Speed: ' + (speed * 3.6).toFixed(1) + ' km/h'
             ].join('<br />');
             document.getElementById('info-button').innerHTML = html;
+
+            if (firstInit) {
+                doBounce(position);
+            }
+            firstInit = false;
         });
 
         geolocation.on('error', function () {
             alert('geolocation error');
-            // FIXME we should remove the coordinates in positions
         });
 
-// convert radians to degrees
+        var accuracyFeature = new ol.Feature();
+        geolocation.on('change:accuracyGeometry', function () {
+            accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+        });
+
+        var positionFeature = new ol.Feature();
+        positionFeature.setStyle(new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 6,
+                fill: new ol.style.Fill({
+                    color: '#3399CC'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#fff',
+                    width: 2
+                })
+            })
+        }));
+
+        geolocation.on('change:position', function () {
+            var coordinates = geolocation.getPosition();
+            positionFeature.setGeometry(coordinates ?
+                new ol.geom.Point(coordinates) : null);
+        });
+
+        var featuresOverlay = new ol.layer.Vector({
+            map: map,
+            source: new ol.source.Vector({
+                features: [accuracyFeature, positionFeature]
+            })
+        });
+
+        function doBounce(location) {
+            // bounce by zooming out one level and back in
+            var bounce = ol.animation.bounce({
+                resolution: map.getView().getResolution() * 2
+            });
+            // start the pan at the current center of the map
+            var pan = ol.animation.pan({
+                source: map.getView().getCenter()
+            });
+            map.beforeRender(bounce);
+            map.beforeRender(pan);
+            // when we set the center to the new location, the animated move will
+            // trigger the bounce and pan effects
+            map.getView().setCenter(location);
+            map.getView().setZoom(17);
+        }
+
+        // convert radians to degrees
         function radToDeg(rad) {
             return rad * 360 / (Math.PI * 2);
         }
 
-// convert degrees to radians
+        // convert degrees to radians
         function degToRad(deg) {
             return deg * Math.PI * 2 / 360;
         }
 
-// modulo for negative values
+        // modulo for negative values
         function mod(n) {
             return ((n % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
         }
-
-        function addPosition(position, heading, m, speed) {
-            var x = position[0];
-            var y = position[1];
-            var fCoords = positions.getCoordinates();
-            var previous = fCoords[fCoords.length - 1];
-            var prevHeading = previous && previous[2];
-            if (prevHeading) {
-                var headingDiff = heading - mod(prevHeading);
-
-                // force the rotation change to be less than 180°
-                if (Math.abs(headingDiff) > Math.PI) {
-                    var sign = (headingDiff >= 0) ? 1 : -1;
-                    headingDiff = -sign * (2 * Math.PI - Math.abs(headingDiff));
-                }
-                heading = prevHeading + headingDiff;
-            }
-            positions.appendCoordinate([x, y, heading, m]);
-
-            // only keep the 20 last coordinates
-            positions.setCoordinates(positions.getCoordinates().slice(-20));
-
-            // FIXME use speed instead
-            if (heading && speed) {
-                markerEl.src = 'data/geolocation_marker_heading.png';
-            } else {
-                markerEl.src = 'data/geolocation_marker.png';
-            }
-        }
-
-        var previousM = 0;
-// change center and rotation before render
-        map.beforeRender(function (map, frameState) {
-            if (frameState !== null) {
-                // use sampling period to get a smooth transition
-                var m = frameState.time - deltaMean * 1.5;
-                m = Math.max(m, previousM);
-                previousM = m;
-                // interpolate position along positions LineString
-                var c = positions.getCoordinateAtM(m, true);
-                var view = frameState.viewState;
-                if (c) {
-                    view.center = getCenterWithHeading(c, -c[2], view.resolution);
-                    view.rotation = -c[2];
-                    marker.setPosition(c);
-                }
-            }
-            return true; // Force animation to continue
-        });
-
-// recenters the view by putting the given coordinates at 3/4 from the top or
-// the screen
-        function getCenterWithHeading(position, rotation, resolution) {
-            var size = map.getSize();
-            var height = size[1];
-
-            return [
-                position[0] - Math.sin(rotation) * height * resolution * 1 / 4,
-                position[1] + Math.cos(rotation) * height * resolution * 1 / 4
-            ];
-        }
-
-// postcompose callback
-        function render() {
-            map.render();
-        }
-
-// geolocate device
-        var geolocateBtn = document.getElementById('geolocate-button');
-        geolocateBtn.addEventListener('click', function () {
-            geolocation.setTracking(true); // Start position tracking
-
-            map.on('postcompose', render);
-            map.render();
-
-            disableButtons();
-        }, false);
-
-// simulate device move
-        var simulationData;
-        $.getJSON('data/geolocation-orientation.json', function (data) {
-            simulationData = data.data;
-        });
-        var simulateBtn = document.getElementById('simulate');
-        simulateBtn.addEventListener('click', function () {
-            var coordinates = simulationData;
-
-            var first = coordinates.shift();
-            simulatePositionChange(first);
-
-            var prevDate = first.timestamp;
-
-            function geolocate() {
-                var position = coordinates.shift();
-                if (!position) {
-                    return;
-                }
-                var newDate = position.timestamp;
-                simulatePositionChange(position);
-                window.setTimeout(function () {
-                    prevDate = newDate;
-                    geolocate();
-                }, (newDate - prevDate) / 0.5);
-            }
-
-            geolocate();
-
-            map.on('postcompose', render);
-            map.render();
-
-            disableButtons();
-        }, false);
-
-        function simulatePositionChange(position) {
-            var coords = position.coords;
-            geolocation.set('accuracy', coords.accuracy);
-            geolocation.set('heading', degToRad(coords.heading));
-            var position_ = [coords.longitude, coords.latitude];
-            var projectedPosition = ol.proj.transform(position_, 'EPSG:4326',
-                'EPSG:3857');
-            geolocation.set('position', projectedPosition);
-            geolocation.set('speed', coords.speed);
-            geolocation.changed();
-        }
-
-        function disableButtons() {
-            geolocateBtn.disabled = 'disabled';
-            simulateBtn.disabled = 'disabled';
-        }
-
 
     })
 });

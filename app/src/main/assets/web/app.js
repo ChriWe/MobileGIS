@@ -26,7 +26,11 @@ define('app', [
             if (options.hasOwnProperty(key)) {
                 $.get('pages/' + options[key].name + '/view/' + options[key].name + '.html').then(
                     function(data) {
-                        options[key].template = data
+                        options[key].template = data;
+                        //if (key === 'map') {
+                        //    console.log("view");
+                        //    $('#content').append(data)
+                        //}
                     }, function() {
                         alert( "$.get failed!" );
                     }
@@ -41,7 +45,10 @@ define('app', [
 
     function replaceTemplate(option) {
         var currentChild =  $('#content').children();
-        options[currentChild.attr("id")].template = currentChild;
+        if (currentChild.length > 0) {
+            options[currentChild.attr("id")].template = currentChild;
+        }
+
         $("#content").empty();
         if ($('#' + option.name).length == 0) {
             $('#content').append(option.template);
