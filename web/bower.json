@@ -1,0 +1,9 @@
+{
+  "name": "web",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "~3.4.1",
+    "mocha": "~2.3.3"
+  }
+}
