@@ -4,17 +4,32 @@
 
 define('map', [
     "jquery",
-    "jqueryMobile"
-], function ($) {
+    "jqueryMobile",
+    "Overpass"
+], function ($,jqm,Overpass) {
     'use strict';
     $(function () {
         console.log("controller");
+
 
         var view = new ol.View({
             center: ol.proj.transform([0, 0], 'EPSG:4326', 'EPSG:3857'),
             zoom: 4
         });
-
+        var myFormat = function(dgts)
+        {
+            return (
+                function(coord1) {
+                    var coord2 = [coord1[1], coord1[0]];
+                    return ol.coordinate.toStringXY(coord2,dgts);
+                });
+        };
+        var mousePositionControl = new ol.control.MousePosition({
+            coordinateFormat: myFormat(3),
+            projection: 'EPSG:4326',
+            undefinedHTML: '&nbsp;',
+            target: document.getElementById('mouse-location')
+        });
         var map = new ol.Map({
             target: 'olMap',
             layers: [
@@ -33,9 +48,22 @@ define('map', [
                 attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
                     collapsible: false
                 })
-            })
+            }).extend([mousePositionControl])
         });
 
+
+
+        map.addEventListener('click', function(){
+                var coord = document.getElementById('mouse-location').textContent.replace(/\s/g, '')
+                    .split(',');
+                /*console.log(parseFloat(coord[0])-0.001,parseFloat(coord[1]-0.001),
+                            parseFloat(coord[0])+0.001,parseFloat(coord[1])+0.001);*/
+                var opRequest = new Overpass();
+                opRequest.bboxset([parseFloat(coord[0]),parseFloat(coord[1]),
+                    parseFloat(coord[0])+0.001,parseFloat(coord[1])+0.001]);//'48.211,16.357,48.212,16.358');
+                opRequest.sendRequest();
+            }
+        );
 
         // geolocate device
         var locateEnabled = false;

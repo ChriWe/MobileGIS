@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MobileGIS.iml" filepath="$PROJECT_DIR$/MobileGIS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MobileGIS_.iml" filepath="$PROJECT_DIR$/MobileGIS_.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/web.iml" filepath="$PROJECT_DIR$/web/web.iml" />
     </modules>
