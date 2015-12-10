@@ -15,5 +15,8 @@ require(["jquery",
     "app",
     "map"
 ], function ($) {
-  console.log('jQuery version ' + $().jquery + ' installed');
+    console.log('jQuery version ' + $().jquery + ' installed');
+    $(window).on('load', function () {
+        $("#index").show();
+    });
 });
