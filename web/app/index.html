@@ -4,8 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>SightViewer</title>
-    <link rel="stylesheet" href="vendor/styles/jquery-mobile.css">
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.0/css/ol.css" type="text/css">
     <link rel="stylesheet" href="index.css" type="text/css">
     <script src="http://openlayers.org/en/v3.11.0/build/ol.js"></script>
 </head>
@@ -21,10 +19,11 @@
     </div>
     <div id="content" data-role="content">
         <div id="map">
-            <div id="olMap"></div>
+            <div id="olMap">
+                <div id="popup" title="Location Info"></div>
+            </div>
             <div id="info-button" ></div>
             <div id="locate-button" data-role="button" data-theme="a" >Locate Me!</div>
-            <div id="mouse-location" style="visibility: hidden"></div>
         </div>
     </div>
 </div>

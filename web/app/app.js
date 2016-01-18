@@ -3,15 +3,15 @@ define('App', [
     "jquery",
     "jqueryMobile",
     "Map"
-], function ($) {
+], function ($, m$, Map) {
     'use strict';
-
-
 
     var options = {
         map: {name: "map", template: undefined},
         data: {name: "data", template: undefined}
     };
+
+    var initPage = options.map;
 
     retrieveTemplates();
 
@@ -23,16 +23,15 @@ define('App', [
        replaceTemplate(options.data);
     });
 
-
     function retrieveTemplates() {
         function doGet(key) {
             if (options.hasOwnProperty(key)) {
                 $.get('pages/' + options[key].name + '/view/' + options[key].name + '.html').then(
                     function(data) {
                         options[key].template = data;
-                        //if (key === 'map') {
-                        //    console.log("view");
-                        //    $('#content').append(data)
+                        //if (key === initPage.name) {
+                        //    $('#content').append(data);
+                        //    console.log(initPage.name + " view initialized.");
                         //}
                     }, function() {
                         alert( "$.get failed!" );

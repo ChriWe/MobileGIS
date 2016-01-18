@@ -1,3 +1,7 @@
+@import url("vendor/styles/bootstrap.min.css");
+@import url("vendor/styles/bootstrap-responsive.min.css");
+@import url("vendor/styles/jquery-mobile.css");
+@import url("http://openlayers.org/en/v3.11.0/css/ol.css");
 @import url("pages/map/styles/map.css");
 
 #content {

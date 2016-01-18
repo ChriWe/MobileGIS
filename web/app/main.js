@@ -2,6 +2,7 @@ require.config({
 	paths: {
 		jquery: 'vendor/scripts/jquery',
 		jqueryMobile: 'vendor/scripts/jquery.mobile-1.3.2',
+        Bootstrap: 'vendor/scripts/bootstrap',
         PouchDB: 'vendor/scripts/pouchdb-5.2.0.min',
         App: 'app',
         Map: 'pages/map/controller/map.controller',
@@ -12,6 +13,7 @@ require.config({
 	},
   shim: {
 	"vendor/scripts/jquery.mobile-1.3.2'" : { deps: ["jquery"], exports: 'jquery' },
+    "bootstrap" : { "deps" :['jquery'] }
   }
 });
 
