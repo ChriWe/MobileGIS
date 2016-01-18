@@ -1,9 +1,12 @@
 /*global define */
-define('app', [
+define('App', [
     "jquery",
-    "jqueryMobile"
+    "jqueryMobile",
+    "Map"
 ], function ($) {
     'use strict';
+
+
 
     var options = {
         map: {name: "map", template: undefined},

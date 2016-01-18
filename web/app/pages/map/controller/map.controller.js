@@ -2,12 +2,15 @@
  * Created by Christoph on 12.11.2015.
  */
 
-define('map', [
+define('Map', [
     "jquery",
     "jqueryMobile",
-    "Overpass"
-], function ($,jqm,Overpass) {
+    "Overpass",
+    "Database",
+    "MarkerManager"
+], function ($, jqm, Overpass, Database, MarkerManager) {
     'use strict';
+
     $(function () {
         console.log("controller");
 
@@ -16,12 +19,11 @@ define('map', [
             center: ol.proj.transform([0, 0], 'EPSG:4326', 'EPSG:3857'),
             zoom: 4
         });
-        var myFormat = function(dgts)
-        {
+        var myFormat = function (dgts) {
             return (
-                function(coord1) {
+                function (coord1) {
                     var coord2 = [coord1[1], coord1[0]];
-                    return ol.coordinate.toStringXY(coord2,dgts);
+                    return ol.coordinate.toStringXY(coord2, dgts);
                 });
         };
         var mousePositionControl = new ol.control.MousePosition({
@@ -53,15 +55,44 @@ define('map', [
 
 
 
-        map.addEventListener('click', function(){
-                var coord = document.getElementById('mouse-location').textContent.replace(/\s/g, '')
-                    .split(',');
+
+        var element = document.getElementById('popup');
+
+        var popup = new ol.Overlay({
+            element: element,
+            positioning: 'bottom-center',
+            stopEvent: false
+        });
+        map.addOverlay(popup);
+
+
+        map.addEventListener('click', function (event) {
+
+                var coord3857 = event.coordinate;
+                var coord4326 = ol.proj.transform(coord3857,'EPSG:3857', 'EPSG:4326');
+                //var coord = document.getElementById('mouse-location').textContent.replace(/\s/g, '')
+                //    .split(',');
                 /*console.log(parseFloat(coord[0])-0.001,parseFloat(coord[1]-0.001),
-                            parseFloat(coord[0])+0.001,parseFloat(coord[1])+0.001);*/
-                var opRequest = new Overpass();
-                opRequest.bboxset([parseFloat(coord[0]),parseFloat(coord[1]),
-                    parseFloat(coord[0])+0.001,parseFloat(coord[1])+0.001]);//'48.211,16.357,48.212,16.358');
-                opRequest.sendRequest();
+                 parseFloat(coord[0])+0.001,parseFloat(coord[1])+0.001);*/
+                var overpass = new Overpass();
+                overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
+                var request = overpass.sendRequest();
+                request.then(function(data){
+
+                    var markerManager = new MarkerManager();
+                    var markerOptions = {
+                        name : "test",
+                        coord : coord3857,
+                        data : data,
+                        showOnMap : true,
+                        target: map
+                    };
+                    var marker = markerManager.addMarker(markerOptions);
+
+                });
+
+                var db = new Database();
+                //db.insertObject(request)
             }
         );
 

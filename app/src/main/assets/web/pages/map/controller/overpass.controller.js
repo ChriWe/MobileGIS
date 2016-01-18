@@ -16,10 +16,21 @@ define('Overpass', [
 
         this.sendRequest = function(){
             var baseURL = 'http://overpass-api.de/api/';
-            var request = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"]("+bbox+");out;";
-            $.getJSON(request ,function(data){
+            var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"]("+bbox+");out;";
+            return request = $.getJSON(requestURL ,function(data){
                 console.log(data);
-            })
+            }).then(function(data) {
+                // filtering the data
+                var elements = data.elements;
+                if (elements.length > 0 ) {
+                    for (var i = 0; i < elements.length; i++) {
+                        if ('name' in elements[i].tags) {
+                            return elements[i].tags;
+                        }
+                    }
+                }
+            });
+
         }
     };
 
