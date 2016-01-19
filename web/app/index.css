@@ -1,6 +1,6 @@
-@import url("vendor/styles/bootstrap.min.css");
-@import url("vendor/styles/bootstrap-responsive.min.css");
-@import url("vendor/styles/jquery-mobile.css");
+@import url("vendor/bootstrap/bootstrap-3.3.6-dist/css/bootstrap.min.css");
+@import url("vendor/bootstrap/bootstrap-editable-v1.1.4/bootstrap-editable/css/bootstrap-editable.css");
+@import url("vendor/jquery/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min.css");
 @import url("http://openlayers.org/en/v3.11.0/css/ol.css");
 @import url("pages/map/styles/map.css");
 

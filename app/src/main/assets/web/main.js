@@ -1,9 +1,10 @@
 require.config({
 	paths: {
-		jquery: 'vendor/scripts/jquery',
-		jqueryMobile: 'vendor/scripts/jquery.mobile-1.3.2',
-        Bootstrap: 'vendor/scripts/bootstrap',
-        PouchDB: 'vendor/scripts/pouchdb-5.2.0.min',
+		jquery: 'vendor/jquery/jquery-1.12.0/jquery.min',
+		jqueryMobile: 'vendor/jquery/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min',
+        Bootstrap: 'vendor/bootstrap/bootstrap-3.3.6-dist/js/bootstrap.min',
+        BootstrapEditable: 'vendor/bootstrap/bootstrap-editable-v1.1.4/bootstrap-editable/js/bootstrap-editable.min',
+        PouchDB: 'vendor/pouchdb/pouchdb-5.2.0/pouchdb-5.2.0.min',
         App: 'app',
         Map: 'pages/map/controller/map.controller',
         Overpass: 'pages/map/controller/overpass.controller',
