@@ -5,29 +5,73 @@
 define('Overpass', [
     "jquery",
     "jqueryMobile"
-],function(){
+], function () {
     console.log("overpass_controller");
     var bbox;
-    var Overpass = function() {
+    var Overpass = function () {
         this.map = map;
-        this.bboxset = function(value){
+        this.bboxset = function (value) {
             bbox = value;
         };
 
-        this.sendRequest = function(){
+        this.sendRequest = function () {
             var baseURL = 'http://overpass-api.de/api/';
-            var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"]("+bbox+");out;";
-            return request = $.getJSON(requestURL ,function(data){
+            var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"](" + bbox + ");out;";
+            return request = $.getJSON(requestURL, function (data) {
                 console.log(data);
-            }).then(function(data) {
+            }).then(function (data) {
                 // filtering the data
                 var elements = data.elements;
-                if (elements.length > 0 ) {
+
+                var template = {
+                    name : {
+                        description: "Name:",
+                        value: undefined
+                    },
+                    description_en : {
+                        description: "Description (en):",
+                        value: undefined
+                    },
+                    description : {
+                        description: "Description:",
+                        value: undefined
+                    },
+                    architect : {
+                        description: "Architekt:",
+                        value: undefined
+                    },
+                    url : {
+                        description: "URL:",
+                        value: undefined
+                    }
+                };
+
+                if (elements.length > 0) {
+                    var templates = [];
                     for (var i = 0; i < elements.length; i++) {
                         if ('name' in elements[i].tags) {
-                            return elements[i].tags;
+                            for (var key in elements[i].tags) {
+                                if (key === 'name') {
+                                    template.name.value = elements[i].tags[key];
+                                }
+                                if (key === 'description:en') {
+                                    template.description_en.value = elements[i].tags[key];
+                                }
+                                if (key === 'description') {
+                                    template.description.value = elements[i].tags[key];
+                                }
+                                if (key === 'architect') {
+                                    template.architect.value = elements[i].tags[key];
+                                }
+                            }
+                            templates.push(template);
                         }
                     }
+
+                  return templates;
+                }
+                else {
+                    return [template];
                 }
             });
 

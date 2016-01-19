@@ -25,9 +25,8 @@ define('MarkerManager', [
 
         this.deleteMarker = function(marker) {
             for (var i = 0; i < markers.length; i++) {
-                if (markers[i].name === marker.name) {
+                if (markers[i].id === marker.id) {
                     markers.splice(i,1);
-
                     if (marker.showOnMap) {
                         marker.target.removeLayer(marker.vectorLayer);
                     }

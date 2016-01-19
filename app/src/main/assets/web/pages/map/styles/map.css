@@ -26,19 +26,17 @@
     width: 130px;
     left: 10px;
 }
-/*#textArea {*/
-    /*width: 230px;*/
-/*}*/
 
 .popover {
     z-index: auto;
     color: black;
+    max-width: 300px;
 }
 .popover-content {
     min-width: 180px;
 }
 .popover.top {
-    margin-top: -42px;
+    margin-top: -70px
 }
 .arrow {
     opacity: 0;

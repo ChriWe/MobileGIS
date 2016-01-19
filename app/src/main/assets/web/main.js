@@ -1,25 +1,28 @@
 require.config({
-	paths: {
-		jquery: 'vendor/jquery/jquery-1.12.0/jquery.min',
-		jqueryMobile: 'vendor/jquery/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min',
+    paths: {
+        jquery: 'vendor/jquery/jquery-1.12.0/jquery.min',
+        jqueryMobile: 'vendor/jquery/jquery.mobile-1.4.5/jquery.mobile-1.4.5.min',
         Bootstrap: 'vendor/bootstrap/bootstrap-3.3.6-dist/js/bootstrap.min',
-        BootstrapEditable: 'vendor/bootstrap/bootstrap-editable-v1.1.4/bootstrap-editable/js/bootstrap-editable.min',
+        Editable: 'vendor/bootstrap/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable',
+        ol3: 'vendor/openlayers/openlayers-v3.11.0/ol.min',
         PouchDB: 'vendor/pouchdb/pouchdb-5.2.0/pouchdb-5.2.0.min',
         App: 'app',
         Map: 'pages/map/controller/map.controller',
         Overpass: 'pages/map/controller/overpass.controller',
-        Database: 'pages/map/controller/database.controller',
         MarkerFactory: 'pages/map/controller/marker.factory',
-        MarkerManager: 'pages/map/controller/marker.manager'
-	},
-  shim: {
-	"vendor/scripts/jquery.mobile-1.3.2'" : { deps: ["jquery"], exports: 'jquery' },
-    "bootstrap" : { "deps" :['jquery'] }
-  }
+        MarkerManager: 'pages/map/controller/marker.manager',
+        Database: 'pages/data/controller/database.controller'
+    },
+    shim: {
+        jqueryMobile: {deps: ['jquery']},
+        Bootstrap: {deps: ['jquery']},
+        Editable : { deps: ['jquery', 'Bootstrap'] },
+        Map: {deps: ['ol3']}
+    }
 });
 
 require(["jquery",
-	"jqueryMobile",
+    "jqueryMobile",
     "App"
 ], function ($) {
     console.log('jQuery version ' + $().jquery + ' installed');

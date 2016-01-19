@@ -76,6 +76,7 @@ $( document ).on( "pagecreate", ".jqm-demos", function( event ) {
 	$( document ).on( "panelopen", ".jqm-search-panel", function() {
 		$( this ).find( "input" ).focus();
 	});
+
 	$( ".jqm-navmenu-link" ).on( "click", function() {
 		page.find( ".jqm-navmenu-panel:not(.jqm-panel-page-nav)" ).panel( "open" );
 	});

@@ -4,16 +4,34 @@
 
 define('MarkerFactory', [
     "jquery",
-    "jqueryMobile"
-],function($, m$){
+    "jqueryMobile",
+    "ol3"
+],function($, m$, ol){
 
     var MarkerFactory = function() {
+
+        var marker = {
+            id: undefined,
+            coord: undefined,
+            showOnMap: undefined,
+            target: undefined,
+            vectorLayer: undefined
+        };
+
+        var setMarker = function(options) {
+          marker.id = options.id;
+          marker.coord = options.coord;
+          marker.showOnMap = options.showOnMap;
+          marker.target = options.target;
+          marker.vectorLayer = options.vectorLayer;
+        };
+
         this.make = function(markerOptions) {
             var options = markerOptions || {};
 
             var iconFeature = new ol.Feature({
                 geometry: new ol.geom.Point(options.coord),
-                name: options.name,
+                name: options.id,
                 data: options.data
             });
 
@@ -37,13 +55,15 @@ define('MarkerFactory', [
                 source: vectorSource
             });
 
-            return {
-                name: options.name,
+            setMarker({
+                id: options.id,
                 coord: options.coord,
                 showOnMap: options.showOnMap,
                 target: options.target,
                 vectorLayer: vectorLayer
-            }
+            });
+
+            return marker
         }
     };
 

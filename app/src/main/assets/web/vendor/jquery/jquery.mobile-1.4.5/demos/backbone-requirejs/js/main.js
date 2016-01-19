@@ -46,6 +46,7 @@ require([
 			$.mobile.hashListeningEnabled = false;
 		}
 	);
+
 	require( [ "jquerymobile" ], function () {
 
 		// Instantiates a new Backbone.js Mobile Router

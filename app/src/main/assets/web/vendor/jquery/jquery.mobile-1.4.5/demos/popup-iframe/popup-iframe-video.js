@@ -26,8 +26,8 @@ $( document ).on( "pagecreate", function() {
 			'width': w - ( ifrPadding + ifrBorder ),
 			'height': h - ( ifrPadding + ifrBorder )
 		};
-	}
-	$( ".ui-popup iframe" )
+    }
+    $( ".ui-popup iframe" )
 		.attr( "width", 0 )
 		.attr( "height", "auto" );
 

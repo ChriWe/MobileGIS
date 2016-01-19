@@ -5,11 +5,13 @@
 define('Map', [
     "jquery",
     "jqueryMobile",
+    "ol3",
     "Overpass",
     "Database",
     "MarkerManager",
-    "Bootstrap"
-], function ($, jqm, Overpass, Database, MarkerManager) {
+    "Bootstrap",
+    "Editable"
+], function ($, jqm, ol, Overpass, Database, MarkerManager) {
     'use strict';
 
     $(function () {
@@ -59,36 +61,74 @@ define('Map', [
         });
         map.addOverlay(popup);
 
+        $.fn.editable.defaults.mode = 'inline';
+
+        var popupOpen = false;
+
         map.addEventListener('click', function (event) {
-            var coord3857 = event.coordinate;
-            var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
+            if (!popupOpen) {
+                var coord3857 = event.coordinate;
+                var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
 
-            var overpass = new Overpass();
-            overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
-            var request = overpass.sendRequest();
-            request.then(function (data) {
-                var markerManager = new MarkerManager();
-                var markerOptions = {
-                    name: "test",
-                    coord: coord3857,
-                    data: data,
-                    showOnMap: true,
-                    target: map
-                };
+                var overpass = new Overpass();
+                overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
+                var request = overpass.sendRequest();
+                request.then(function (data) {
+                    // just take first element
+                    if (data > 1) {
+                        data = [data[0]];
+                    }
 
-                var marker = markerManager.addMarker(markerOptions);
+                    var markerManager = new MarkerManager();
+                    var markerOptions = {
+                        id: Number(Math.abs(coord3857[0].toFixed(0)) + "" + Math.abs(coord3857[1].toFixed(0))),
+                        coord: coord3857,
+                        data: data,
+                        showOnMap: true,
+                        target: map
+                    };
 
-                $(element).popover('destroy');
-                popup.setPosition(coord3857);
-                $(element).popover({
-                    'placement': 'top',
-                    'animation': false,
-                    'html': true,
-                    'content': createDataTemplate(data, coord4326).outerHTML
+                    //click on free space -> remove previous marker from map if not in db and show new marker and popup
+
+                    var feature = map.forEachFeatureAtPixel(event.pixel,
+                        function (feature, layer) {
+                            return feature;
+                        }
+                    );
+
+                    if (!feature) {
+                        var marker = markerManager.addMarker(markerOptions);
+                    }
+
+                    $(element).popover('destroy');
+                    popup.setPosition(coord3857);
+                    $(element).popover({
+                        'placement': 'top',
+                        'animation': false,
+                        'html': true,
+                        'content': createDataTemplate(data, coord3857)
+                    });
+                    $(element).popover('show');
+                    popupOpen = true;
+
+                    $('.popover-title').append('<button type="button" class="close">&times;</button>');
+                    $('.popover-content').append(
+                        '<button id="save" type="button" class="btn btn-success btn-sm" style="float:right">Save</button>'
+                    );
+
+                    $('.close').click(function (e) {
+                        $(element).popover('hide');
+                        markerManager.deleteMarker(marker);
+                        popupOpen = false;
+                    });
+                    $('#save').click(function (e) {
+                        $(element).popover('hide');
+                        popupOpen = false;
+                    });
+
+                    registerEditables(data);
                 });
-                $(element).popover('show');
-
-            });
+            }
 
             //var db = new Database();
             //db.insertObject(request)
@@ -96,25 +136,56 @@ define('Map', [
 
         function createDataTemplate(data, coord4326) {
             var dataTemplate = document.createElement("div");
-            var p = dataTemplate.appendChild(document.createElement("p"));
-            var ul = p.appendChild(document.createElement("ul"));
-            for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    var li = ul.appendChild(document.createElement("li"));
-                    if (data) {
-                        li.innerHTML = key + ": " + data[key];
-                    } else {
-                        li.innerHTML = "No Info Available";
+            var table = dataTemplate.appendChild(document.createElement("table"));
+            var p = table.appendChild(document.createElement("p"));
+
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    var currentData = data[i];
+                    var j = 0;
+                    for (var key in currentData) {
+                        if (currentData.hasOwnProperty(key)) {
+                            var tr = p.appendChild(document.createElement("tr"));
+                            var span = tr.appendChild(document.createElement("span"));
+                            span.innerHTML = currentData[key].description + " ";
+                            var a = span.appendChild(document.createElement("a"));
+                            a.setAttribute("href", "#");
+                            a.setAttribute("id", i + "-" + j + "-editable");
+                            a.setAttribute("data-type", "text");
+                            a.setAttribute("data-pk", "1");
+                            a.setAttribute("data-title", currentData[key].value);
+                            a.innerHTML =  currentData[key].value;
+                        }
+                        j++;
+                    }
+                }
+            } else {
+                var tr = p.appendChild(document.createElement("tr"));
+                var a = tr.appendChild(document.createElement("a"));
+                a.innerHTML = "No Info Available";
+            }
+
+            var c = dataTemplate.appendChild(document.createElement("code"));
+            c.innerHTML = coord4326[0].toFixed(6) + ", " + coord4326[1].toFixed(6);
+            c.id = "coord";
+
+
+            return dataTemplate;
+        }
+
+        function registerEditables(data) {
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    var currentData = data[i];
+                    var j = 0;
+                    for (var key in currentData) {
+                        if (currentData.hasOwnProperty(key)) {
+                            $('#' + i + "-" + j + "-editable").editable();
+                        }
+                        j++;
                     }
                 }
             }
-            var c = dataTemplate.appendChild(document.createElement("code"));
-            c.innerHTML = [coord4326[0].toFixed(6), coord4326[1].toFixed(6)];
-            c.id = "coord";
-            var form = dataTemplate.appendChild(document.createElement("textArea"));
-            form.id = "textArea";
-
-            return dataTemplate;
         }
 
         // geolocate device
@@ -156,14 +227,14 @@ define('Map', [
             var speed = geolocation.getSpeed() || 0;
             var m = Date.now();
 
-            var html = [
-                'Position: ' + position[0].toFixed(2) + ', ' + position[1].toFixed(2) + ' [m]',
-                'Altitude: ' + altitude + ' [m]',
-                'Accuracy: ' + 'xy - ' + accuracy + ', h - ' + altitudeAccuracy + ' [m]',
-                'Heading: ' + Math.round(radToDeg(heading)) + '&deg;',
-                'Speed: ' + (speed * 3.6).toFixed(1) + ' km/h'
-            ].join('<br />');
-            document.getElementById('info-button').innerHTML = html;
+            //var html = [
+            //    'Position: ' + position[0].toFixed(2) + ', ' + position[1].toFixed(2) + ' [m]',
+            //    'Altitude: ' + altitude + ' [m]',
+            //    'Accuracy: ' + 'xy - ' + accuracy + ', h - ' + altitudeAccuracy + ' [m]',
+            //    'Heading: ' + Math.round(radToDeg(heading)) + '&deg;',
+            //    'Speed: ' + (speed * 3.6).toFixed(1) + ' km/h'
+            //].join('<br />');
+            //document.getElementById('info-button').innerHTML = html;
 
             if (firstInit) {
                 doBounce(position);
