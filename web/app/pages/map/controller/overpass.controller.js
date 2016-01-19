@@ -22,9 +22,15 @@ define('Overpass', [
             }).then(function(data) {
                 // filtering the data
                 var elements = data.elements;
+                var defkey = ['name','description:en','description','architect','url'];
                 if (elements.length > 0 ) {
                     for (var i = 0; i < elements.length; i++) {
                         if ('name' in elements[i].tags) {
+                            for (var keys in elements[i].tags){
+                                if(!($.inArray(keys, defkey) > -1 )){
+                                    delete elements[i].tags[keys];
+                                }
+                            }
                             return elements[i].tags;
                         }
                     }
