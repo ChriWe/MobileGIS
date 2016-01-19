@@ -103,10 +103,12 @@ define('Map', [
                     var li = ul.appendChild(document.createElement("li"));
                     if (data) {
                         li.innerHTML = key + ": " + data[key];
-                    } else {
-                        li.innerHTML = "No Info Available";
                     }
                 }
+            }
+            if (data == null) {
+                var li = ul.appendChild(document.createElement("li"));
+                li.innerHTML = "No Info Available";
             }
             var c = dataTemplate.appendChild(document.createElement("code"));
             c.innerHTML = [coord4326[0].toFixed(6), coord4326[1].toFixed(6)];
