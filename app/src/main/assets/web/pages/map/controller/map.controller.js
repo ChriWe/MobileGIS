@@ -55,138 +55,60 @@ define('Map', [
             }).extend([mousePositionControl])
         });
 
-        var element = document.getElementById('popup');
-        var popup = new ol.Overlay({
-            element: element
-        });
-        map.addOverlay(popup);
-
-        $.fn.editable.defaults.mode = 'inline';
-
-        var popupOpen = false;
+        var markerManager = new MarkerManager();
 
         map.addEventListener('click', function (event) {
-            if (!popupOpen) {
-                var coord3857 = event.coordinate;
-                var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
+            var coord3857 = event.coordinate;
+            var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
 
-                var overpass = new Overpass();
-                overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
-                var request = overpass.sendRequest();
-                request.then(function (data) {
-                    // just take first element
-                    if (data > 1) {
-                        data = [data[0]];
+            var overpass = new Overpass();
+            overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
+            var request = overpass.sendRequest();
+            request.then(function (data) {
+                // just take first element
+                if (data > 1) {
+                    data = [data[0]];
+                }
+
+                var markerOptions = {
+                    id: Number(Math.abs(coord3857[0].toFixed(0)) + "" + Math.abs(coord3857[1].toFixed(0))),
+                    coord: coord3857,
+                    data: data,
+                    popupOpen: true,
+                    saved: false,
+                    target: map
+                };
+
+                //click on free space -> remove previous marker from map if not in db and show new marker and popup
+                var feature = map.forEachFeatureAtPixel(event.pixel,
+                    function (feature, layer) {
+                        return feature;
                     }
+                );
 
-                    var markerManager = new MarkerManager();
-                    var markerOptions = {
-                        id: Number(Math.abs(coord3857[0].toFixed(0)) + "" + Math.abs(coord3857[1].toFixed(0))),
-                        coord: coord3857,
-                        data: data,
-                        showOnMap: true,
-                        target: map
-                    };
-
-                    //click on free space -> remove previous marker from map if not in db and show new marker and popup
-
-                    var feature = map.forEachFeatureAtPixel(event.pixel,
-                        function (feature, layer) {
-                            return feature;
-                        }
-                    );
-
-                    if (!feature) {
-                        var marker = markerManager.addMarker(markerOptions);
+                var activeMarker = markerManager.getActiveMarker();
+                if (markerManager.activeMarkerExists()) {
+                    if (!activeMarker.saved) {
+                        markerManager.removeActiveMarker()
                     }
+                }
 
-                    $(element).popover('destroy');
-                    popup.setPosition(coord3857);
-                    $(element).popover({
-                        'placement': 'top',
-                        'animation': false,
-                        'html': true,
-                        'content': createDataTemplate(data, coord3857)
-                    });
-                    $(element).popover('show');
-                    popupOpen = true;
+                if (feature) {
+                    if (feature.getProperties().type === 'Marker') {
+                        var marker = markerManager.getMarker(feature.getProperties().id);
+                        markerManager.openPopup(marker);
+                    }
+                } else {
+                    var marker = markerManager.setActiveMarker(markerOptions);
+                    markerManager.openPopup(marker);
+                }
+            });
 
-                    $('.popover-title').append('<button type="button" class="close">&times;</button>');
-                    $('.popover-content').append(
-                        '<button id="save" type="button" class="btn btn-success btn-sm" style="float:right">Save</button>'
-                    );
-
-                    $('.close').click(function (e) {
-                        $(element).popover('hide');
-                        markerManager.deleteMarker(marker);
-                        popupOpen = false;
-                    });
-                    $('#save').click(function (e) {
-                        $(element).popover('hide');
-                        popupOpen = false;
-                    });
-
-                    registerEditables(data);
-                });
-            }
 
             //var db = new Database();
             //db.insertObject(request)
         });
 
-        function createDataTemplate(data, coord4326) {
-            var dataTemplate = document.createElement("div");
-            var table = dataTemplate.appendChild(document.createElement("table"));
-            var p = table.appendChild(document.createElement("p"));
-
-            if (data.length > 0) {
-                for (var i = 0; i < data.length; i++) {
-                    var currentData = data[i];
-                    var j = 0;
-                    for (var key in currentData) {
-                        if (currentData.hasOwnProperty(key)) {
-                            var tr = p.appendChild(document.createElement("tr"));
-                            var span = tr.appendChild(document.createElement("span"));
-                            span.innerHTML = currentData[key].description + " ";
-                            var a = span.appendChild(document.createElement("a"));
-                            a.setAttribute("href", "#");
-                            a.setAttribute("id", i + "-" + j + "-editable");
-                            a.setAttribute("data-type", "text");
-                            a.setAttribute("data-pk", "1");
-                            a.setAttribute("data-title", currentData[key].value);
-                            a.innerHTML =  currentData[key].value;
-                        }
-                        j++;
-                    }
-                }
-            } else {
-                var tr = p.appendChild(document.createElement("tr"));
-                var a = tr.appendChild(document.createElement("a"));
-                a.innerHTML = "No Info Available";
-            }
-
-            var c = dataTemplate.appendChild(document.createElement("code"));
-            c.innerHTML = coord4326[0].toFixed(6) + ", " + coord4326[1].toFixed(6);
-            c.id = "coord";
-
-
-            return dataTemplate;
-        }
-
-        function registerEditables(data) {
-            if (data.length > 0) {
-                for (var i = 0; i < data.length; i++) {
-                    var currentData = data[i];
-                    var j = 0;
-                    for (var key in currentData) {
-                        if (currentData.hasOwnProperty(key)) {
-                            $('#' + i + "-" + j + "-editable").editable();
-                        }
-                        j++;
-                    }
-                }
-            }
-        }
 
         // geolocate device
         var locateEnabled = false;

@@ -5,39 +5,90 @@
 define('MarkerManager', [
     "jquery",
     "jqueryMobile",
-    "MarkerFactory"
-],function($, m$, MarkerFactory){
+    "MarkerFactory",
+    "Marker"
+], function ($, m$, MarkerFactory, Marker) {
 
-    var MarkerManager = function() {
+    var MarkerManager = function () {
+        var activeMarker;
         var markers = [];
-        var markerFactory = new MarkerFactory();
+        var markerFactory = new MarkerFactory(this);
 
-        this.addMarker = function(markerOptions) {
-            var marker = markerFactory.make(markerOptions);
-            markers.push(marker);
 
-            if (marker.showOnMap) {
-                marker.target.addLayer(marker.vectorLayer);
+        this.activeMarkerExists = function() {
+            if (activeMarker) {
+                return true
             }
-
-            return marker;
+            return false;
         };
 
-        this.deleteMarker = function(marker) {
+        this.getActiveMarker = function () {
+            return activeMarker;
+        };
+
+        this.removeActiveMarker = function () {
+            activeMarker.target.removeLayer(activeMarker.vectorLayer);
+        };
+
+        this.setActiveMarker = function (markerOptions) {
+            activeMarker = markerFactory.make(markerOptions);
+            activeMarker.target.addLayer(activeMarker.vectorLayer);
+            return activeMarker;
+        };
+
+        this.addMarker = function (marker) {
+            markers.push(marker);
+        };
+
+        this.removeMarker = function (marker) {
             for (var i = 0; i < markers.length; i++) {
                 if (markers[i].id === marker.id) {
-                    markers.splice(i,1);
-                    if (marker.showOnMap) {
-                        marker.target.removeLayer(marker.vectorLayer);
-                    }
+                    marker.target.removeLayer(marker.vectorLayer);
+                    markers.splice(i, 1);
                     return;
                 }
             }
         };
 
-        this.getMarkers = function() {
+        this.updateMarker = function (marker) {
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].id === marker.id) {
+                    markers[i] = marker;
+                    return;
+                }
+            }
+        };
+
+        this.getMarker = function(id) {
+            for (var i = 0; i < markers.length; i++) {
+                if (markers[i].id === id) {
+                    return markers[i];
+                }
+            }
+        };
+
+        this.openPopup = function (marker) {
+            marker.openPopup();
+        };
+
+        this.closePopup = function (marker) {
+            marker.closePopup();
+        };
+
+        this.getMarkers = function () {
             return markers;
         };
+
+        this.deleteUnsavedMarkers = function () {
+            for (var i = 0; i < markers.length; i++) {
+                if (!markers[i].saved) {
+                    markers[i].target.removeLayer(markers[i].vectorLayer);
+                    markers[i].closePopup();
+                    markers.splice(i, 1);
+                    return;
+                }
+            }
+        }
 
     };
 

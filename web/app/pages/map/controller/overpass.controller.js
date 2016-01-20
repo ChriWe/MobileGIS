@@ -63,6 +63,9 @@ define('Overpass', [
                                 if (key === 'architect') {
                                     template.architect.value = elements[i].tags[key];
                                 }
+                                if (key === 'url') {
+                                    template.url.value = elements[i].tags[key];
+                                }
                             }
                             templates.push(template);
                         }
