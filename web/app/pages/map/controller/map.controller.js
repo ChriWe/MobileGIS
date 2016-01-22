@@ -9,17 +9,18 @@ define('Map', [
     "Overpass",
     "Database",
     "MarkerManager",
+    "PouchDB",
     "Bootstrap",
     "Editable"
-], function ($, jqm, ol, Overpass, Database, MarkerManager) {
+], function ($, jqm, ol, Overpass, Database, MarkerManager, PouchDB) {
     'use strict';
 
     $(function () {
         console.log("map_controller");
 
         var view = new ol.View({
-            center: ol.proj.transform([0, 0], 'EPSG:4326', 'EPSG:3857'),
-            zoom: 4
+            center: ol.proj.transform([16, 48], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 5
         });
         var myFormat = function (dgts) {
             return (
@@ -56,6 +57,9 @@ define('Map', [
         });
 
         var markerManager = new MarkerManager();
+        // initialize database and sync it with the serverDB on startup
+        var db = new Database();
+        sync_load();
 
         map.addEventListener('click', function (event) {
             var coord3857 = event.coordinate;
@@ -71,7 +75,7 @@ define('Map', [
                 }
 
                 var markerOptions = {
-                    id: Number(Math.abs(coord3857[0].toFixed(0)) + "" + Math.abs(coord3857[1].toFixed(0))),
+                    id: UUID(),
                     coord: coord3857,
                     data: data,
                     popupOpen: true,
@@ -103,11 +107,44 @@ define('Map', [
                     markerManager.openPopup(marker);
                 }
             });
-
-
-            //var db = new Database();
-            //db.insertObject(request)
         });
+
+        function UUID() {
+            var d = new Date().getTime();
+            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random()*16)%16 | 0;
+                d = Math.floor(d/16);
+                return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+
+        // synchronize with database
+        var syncBtn = document.getElementById('sync-button');
+        syncBtn.addEventListener('click', function () {
+            db.syncDB();
+
+        });
+        function sync_load(){
+            db.syncDB();
+            db.browserDb.allDocs({
+                include_docs: true
+            })
+                .then(function (docs){
+                    for(var i = 0; i <= docs.total_rows; i++) {
+                        var markerOptions = {
+                            id: docs.rows[i].id,
+                            coord: docs.rows[i].doc.geometry.coordinates,
+                            data: docs.rows[i].doc.properties,
+                            popupOpen: true,
+                            saved: true,
+                            target: map
+                        };
+                        var marker = markerManager.setActiveMarker(markerOptions);
+                        markerManager.addMarker(marker);
+                    }
+                })
+        }
 
 
         // geolocate device

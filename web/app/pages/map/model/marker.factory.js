@@ -15,7 +15,6 @@ define('MarkerFactory', [
 
         this.make = function(markerOptions) {
             var options = markerOptions || {};
-
             var iconFeature = new ol.Feature({
                 geometry: new ol.geom.Point(options.coord),
                 id: options.id,

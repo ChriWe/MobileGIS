@@ -5,8 +5,9 @@
 define('Marker', [
     "jquery",
     "jqueryMobile",
-    "ol3"
-], function ($, m$, ol) {
+    "ol3",
+    "Database"
+], function ($, m$, ol, Database) {
 
     var Marker = function (options, markerManager) {
         this.id = options.id;
@@ -16,6 +17,7 @@ define('Marker', [
         this.target = options.target;
         this.data = options.data;
         this.vectorLayer = options.vectorLayer;
+        var db = new Database();
 
         var self = this;
         this.openPopup = function () {
@@ -55,7 +57,7 @@ define('Marker', [
             });
             $('#save').click(function (e) {
                 updateData();
-
+                db.insertLocal(self);
                 $(element).popover('hide');
 
                 self.saved = true;
