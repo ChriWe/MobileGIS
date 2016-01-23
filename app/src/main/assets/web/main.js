@@ -12,7 +12,7 @@ require.config({
         Marker: 'pages/map/model/marker.model',
         MarkerFactory: 'pages/map/model/marker.factory',
         MarkerManager: 'pages/map/controller/marker.manager',
-        Database: 'pages/data/controller/database.controller'
+        Database: 'pages/map/controller/database.controller'
     },
     shim: {
         jqueryMobile: {deps: ['jquery']},

@@ -31,22 +31,80 @@ define('Database', [
 
     };
 
-    Database.prototype.insertObject = function(object) {
 
+/*    Database.prototype.insertServer = function(object) {
         var x = object;
         //var x = this.serverDb;
 
 
-        //return this.serverDb.put(object, function(err, result) {
-        //    if (err) {
-        //        console.log("Database error: " +  err)
-        //    } else {
-        //        console.log(result)
-        //    }
-        //});
+        return this.serverDb.put(object, function(err, result) {
+            if (err) {
+                console.log("Database error: " +  err)
+            } else {
+                console.log(result)
+            }
+        });
+    };*/
+    Database.prototype.insertLocal = function(object){
+        var self = this;
+        self.serverDb
+            .get(object.id).catch(function (err){
+                if(err.status === 404){
+
+                    var localdoc = {
+                        "_id": object.id,
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": object.coord
+                        },
+                        "properties": object.data
+                    };
+                    return self.browserDb.put(localdoc, function(err, result) {
+                        if (err) {
+                            console.log("Database error: " +  err)
+                        } else {
+                            console.log('da' + result)
+                        }
+                    });
+                }
+            })
+            .then(function(serverdoc) {
+                return self.serverDb.put({
+                    "_id": object.id,
+                    "_rev": serverdoc._rev,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": object.coord
+                    },
+                    "properties": object.data
+                });
+            })
+
     };
 
-
-
+    Database.prototype.syncDB = function (){
+        var syncOpt = {live: true, retry: true};
+        PouchDB.sync(this.browserDb, this.serverDb, syncOpt)
+            .on('change', function(info){
+                $("#sync-button .ui-btn-text").text("changed");
+                console.log("sync: change");
+            })
+            .on('paused', function(info){
+                $("#sync-button .ui-btn-text").text("Sync!");
+                console.log("sync: paused");
+            })
+            .on('active', function(info){
+                $("#sync-button .ui-btn-text").text("active");
+                console.log("sync: active");
+            })
+            .on('error', function(info){
+                $("#sync-button .ui-btn-text").text("error");
+                console.log("sync: error");
+            })
+            .on('complete', function(info){
+                $("#sync-button .ui-btn-text").text("complete");
+                console.log("sync: complete");
+            });
+    };
     return Database;
 });

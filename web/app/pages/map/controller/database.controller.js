@@ -105,6 +105,6 @@ define('Database', [
                 $("#sync-button .ui-btn-text").text("complete");
                 console.log("sync: complete");
             });
-    }
+    };
     return Database;
 });
