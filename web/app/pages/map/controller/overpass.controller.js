@@ -18,7 +18,6 @@ define('Overpass', [
             var baseURL = 'http://overpass-api.de/api/';
             var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"](" + bbox + ");out;";
             return request = $.getJSON(requestURL, function (data) {
-                console.log(data);
             }).then(function (data) {
                 // filtering the data
                 var elements = data.elements;
