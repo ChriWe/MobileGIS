@@ -11,8 +11,6 @@ define('MarkerFactory', [
 
     var MarkerFactory = function(markerManager) {
 
-        var popupOpen = false;
-
         this.make = function(markerOptions) {
             var options = markerOptions || {};
             var iconFeature = new ol.Feature({
