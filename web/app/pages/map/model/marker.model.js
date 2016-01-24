@@ -49,22 +49,20 @@ define('Marker', [
                 $(element).popover('destroy');
 
                 self.popupOpen = false;
-                markerManager.updateMarker(self);
                 if (!self.saved) {
                     markerManager.removeMarker(self);
                 }
             });
             $('#save').click(function (e) {
                 updateData();
+                $(element).popover('hide');
+                self.saved = true;
+                self.popupOpen = false;
+                markerManager.updateMarker(self);
+
                 if (typeof storeCallback === "function") {
                     storeCallback(self);
                 }
-
-                $(element).popover('hide');
-
-                self.saved = true;
-                self.popupOpen = false;
-                markerManager.addMarker(self)
             });
 
             registerEditables(self.data);

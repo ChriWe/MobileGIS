@@ -80,7 +80,7 @@ define('Map', [
                 }
             } else {
                 var markerOptions = {
-                    id: undefined,
+                    id: db.UUID(),
                     coord: coord3857,
                     data: undefined,
                     popupOpen: true,
@@ -120,7 +120,7 @@ define('Map', [
         var syncOpt = {live: true, retry: true};
         PouchDB.sync(db.browserDb, db.serverDb, syncOpt).on('change', function (info) {
             for (var i = 0; i < info.change.docs.length; i++) {
-                if (info.change.docs[i]._deleted = true) {
+                if (info.change.docs[i]._deleted === true) {
                     var todelete = markerManager.getMarker(info.change.docs[i]._id);
                     markerManager.removeMarker(todelete);
                 }
