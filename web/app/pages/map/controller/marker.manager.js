@@ -29,8 +29,10 @@ define('MarkerManager', [
         this.removeMarker = function (marker) {
             for (var i = 0; i < markers.length; i++) {
                 if (markers[i].id === marker.id) {
+                    console.log(markers);
                     marker.target.removeLayer(marker.vectorLayer);
                     markers.splice(i, 1);
+                    console.log(markers);
                     return;
                 }
             }

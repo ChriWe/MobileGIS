@@ -8,8 +8,6 @@
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/map.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/marker.manager.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/overpass.controller.js" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/web/app/pages/map/model/database.model.js" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/web/app/pages/map/model/map.model.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.factory.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.model.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/styles/map.css" charset="UTF-8" />
