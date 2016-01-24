@@ -19,6 +19,7 @@ define('Overpass', [
             var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"](" + bbox + ");out;";
             return request = $.getJSON(requestURL, function (data) {
             }).then(function (data) {
+                console.log(data);
                 // filtering the data
                 var elements = data.elements;
 

@@ -26,6 +26,12 @@
     width: 130px;
     left: 10px;
 }
+#sync-button {
+    position: absolute;
+    bottom: 30px;
+    width: 130px;
+    right: 10px;
+}
 
 .popover {
     z-index: auto;

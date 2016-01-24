@@ -123,10 +123,6 @@ define('Map', [
         var syncBtn = document.getElementById('sync-button');
         syncBtn.addEventListener('click', function () {
             db.syncDB();
-
-        });
-        function sync_load(){
-            db.syncDB();
             db.browserDb.allDocs({
                 include_docs: true
             })
@@ -144,6 +140,11 @@ define('Map', [
                         markerManager.addMarker(marker);
                     }
                 })
+
+        });
+        function sync_load(){
+            db.syncDB();
+
         }
 
 
