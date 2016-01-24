@@ -51,6 +51,7 @@ define('MarkerManager', [
                     return markers[i];
                 }
             }
+            return false;
         };
 
         this.openPopup = function (marker, storeCallback) {
@@ -69,13 +70,11 @@ define('MarkerManager', [
             return markers;
         };
 
-        this.deleteUnsavedMarkers = function () {
-            for (var i = 0; i < markers.length; i++) {
-                if (!markers[i].saved) {
-                    markers[i].target.removeLayer(markers[i].vectorLayer);
-                    markers[i].closePopup();
-                    markers.splice(i, 1);
-                    return;
+        this.removeUnsavedMarkers = function () {
+            if (selectedMarker) {
+                if (!selectedMarker.saved) {
+                    this.closePopup(selectedMarker);
+                    this.removeMarker(selectedMarker);
                 }
             }
         }

@@ -12,7 +12,7 @@ define('Map', [
     "PouchDB",
     "Bootstrap",
     "Editable"
-], function ($, jqm, ol, Overpass, Database, MarkerManager) {
+], function ($, jqm, ol, Overpass, Database, MarkerManager, PouchDB) {
     'use strict';
 
     var markerManager = new MarkerManager();
@@ -63,56 +63,69 @@ define('Map', [
             var coord3857 = event.coordinate;
             var coord4326 = ol.proj.transform(coord3857, 'EPSG:3857', 'EPSG:4326');
 
-            var overpass = new Overpass();
-            overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
-            var request = overpass.sendRequest();
-            request.then(function (data) {
-                // just take first element
-                if (data > 1) {
-                    data = [data[0]];
+            var feature = map.forEachFeatureAtPixel(event.pixel,
+                function (feature, layer) {
+                    return feature;
                 }
+            );
 
+            if (feature) {
+                if (feature.getProperties().type === 'Marker') {
+                    var marker = markerManager.getMarker(feature.getProperties().id);
+
+                    markerManager.removeUnsavedMarkers();
+                    markerManager.openPopup(marker, function (storeData) {
+                        db.insertLocal(storeData);
+                    });
+                }
+            } else {
                 var markerOptions = {
                     id: undefined,
                     coord: coord3857,
-                    data: data,
+                    data: undefined,
                     popupOpen: true,
                     saved: false,
                     target: map
                 };
 
-                //click on free space -> remove previous marker from map if not in db and show new marker and popup
-                var feature = map.forEachFeatureAtPixel(event.pixel,
-                    function (feature, layer) {
-                        return feature;
+                var overpass = new Overpass();
+                overpass.bboxset([coord4326[1], coord4326[0], coord4326[1] + 0.001, coord4326[0] + 0.001]);//'48.211,16.357,48.212,16.358');
+                var request = overpass.sendRequest();
+                request.then(function (data) {
+                    // just take first element
+                    if (data > 1) {
+                        data = [data[0]];
                     }
-                );
+                    markerOptions.data = data;
+                    openMarker(markerOptions)
+                }, function(error) {
+                    markerOptions.data = [overpass.getTemplate()];
+                    openMarker(markerOptions)
+                });
 
-                var selectedMarker = markerManager.getSelectedMarker();
-                if (selectedMarker) {
-                    if (!selectedMarker.saved) {
-                        markerManager.removeMarker(selectedMarker);
-                    }
-                }
+            }
 
-                if (feature) {
-                    if (feature.getProperties().type === 'Marker') {
-                        var marker = markerManager.getMarker(feature.getProperties().id);
-                        markerManager.openPopup(marker, function (storeData) {
-                            db.insertLocal(storeData);
-                        });
-                    }
-                } else {
-                    var marker = markerManager.addMarker(markerOptions);
-                    markerManager.openPopup(marker, function (storeData) {
-                        db.insertLocal(storeData);
-                    });
-                }
-            });
+            function openMarker(markerOptions) {
+                markerManager.removeUnsavedMarkers();
+                var marker = markerManager.addMarker(markerOptions);
+                markerManager.openPopup(marker, function (storeData) {
+                    db.insertLocal(storeData);
+                });
+            }
+
         });
 
         // synchronize with database
         var syncBtn = document.getElementById('sync-button');
+        var syncOpt = {live: true, retry: true};
+        PouchDB.sync(db.browserDb, db.serverDb, syncOpt).on('change', function (info) {
+            for (var i = 0; i < info.change.docs.length; i++) {
+                if (info.change.docs[i]._deleted = true) {
+                    var todelete = markerManager.getMarker(info.change.docs[i]._id);
+                    markerManager.removeMarker(todelete);
+                }
+            }
+        });
         syncBtn.addEventListener('click', function () {
             db.syncDB();
             db.browserDb.allDocs({
@@ -127,11 +140,25 @@ define('Map', [
                         saved: true,
                         target: map
                     };
-                    var marker = markerManager.addMarker(markerOptions);
+                    if(!markerManager.getMarker(markerOptions.id)) {
+                        markerManager.addMarker(markerOptions);
+                    }
                 }
             })
 
         });
+
+        function connectionAvailable() {
+            $.ajaxSetup({async: false});
+            var re = "";
+            var r = Math.round(Math.random() * 10000);
+            $.get("http://google.com", {subins: r}, function (d) {
+                re = true;
+            }).error(function () {
+                re = false;
+            });
+            return re;
+        }
 
         // geolocate device
         var locateEnabled = false;
@@ -165,12 +192,12 @@ define('Map', [
         // Listen to position changes
         geolocation.on('change', function (evt) {
             var position = geolocation.getPosition();
-            var altitude = geolocation.getAltitude();
-            var altitudeAccuracy = geolocation.getAltitudeAccuracy();
-            var accuracy = geolocation.getAccuracy();
-            var heading = geolocation.getHeading() || 0;
-            var speed = geolocation.getSpeed() || 0;
-            var m = Date.now();
+            //var altitude = geolocation.getAltitude();
+            //var altitudeAccuracy = geolocation.getAltitudeAccuracy();
+            //var accuracy = geolocation.getAccuracy();
+            //var heading = geolocation.getHeading() || 0;
+            //var speed = geolocation.getSpeed() || 0;
+            //var m = Date.now();
 
             //var html = [
             //    'Position: ' + position[0].toFixed(2) + ', ' + position[1].toFixed(2) + ' [m]',
@@ -191,10 +218,10 @@ define('Map', [
             alert('geolocation error');
         });
 
-        var accuracyFeature = new ol.Feature();
-        geolocation.on('change:accuracyGeometry', function () {
-            accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-        });
+        //var accuracyFeature = new ol.Feature();
+        //geolocation.on('change:accuracyGeometry', function () {
+        //    accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+        //});
 
         var positionFeature = new ol.Feature();
         positionFeature.setStyle(new ol.style.Style({
@@ -219,7 +246,8 @@ define('Map', [
         var featuresOverlay = new ol.layer.Vector({
             map: map,
             source: new ol.source.Vector({
-                features: [accuracyFeature, positionFeature]
+                features: [positionFeature]
+                //features: [accuracyFeature, positionFeature]
             })
         });
 

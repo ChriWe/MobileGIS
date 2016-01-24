@@ -13,6 +13,30 @@ define('Overpass', [
         this.bboxset = function (value) {
             bbox = value;
         };
+        this.getTemplate = function() {
+            return {
+                name : {
+                    description: "Name:",
+                    value: undefined
+                },
+                description_en : {
+                    description: "Description (en):",
+                    value: undefined
+                },
+                description : {
+                    description: "Description:",
+                    value: undefined
+                },
+                architect : {
+                    description: "Architekt:",
+                    value: undefined
+                },
+                url : {
+                    description: "URL:",
+                    value: undefined
+                }
+            };
+        };
 
         this.sendRequest = function () {
             var baseURL = 'http://overpass-api.de/api/';
@@ -21,6 +45,7 @@ define('Overpass', [
             }).then(function (data) {
                 console.log(data);
                 // filtering the data
+                console.log(data);
                 var elements = data.elements;
 
                 var template = {
