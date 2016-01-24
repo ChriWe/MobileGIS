@@ -17,10 +17,9 @@ define('Marker', [
         this.target = options.target;
         this.data = options.data;
         this.vectorLayer = options.vectorLayer;
-        var db = new Database();
 
         var self = this;
-        this.openPopup = function () {
+        this.openPopup = function (storeCallback) {
             var element = document.getElementById('popup');
             var popup = new ol.Overlay({
                 element: element
@@ -52,12 +51,15 @@ define('Marker', [
                 self.popupOpen = false;
                 markerManager.updateMarker(self);
                 if (!self.saved) {
-                    markerManager.removeActiveMarker(self);
+                    markerManager.removeMarker(self);
                 }
             });
             $('#save').click(function (e) {
                 updateData();
-                db.insertLocal(self);
+                if (typeof storeCallback === "function") {
+                    storeCallback(self);
+                }
+
                 $(element).popover('hide');
 
                 self.saved = true;

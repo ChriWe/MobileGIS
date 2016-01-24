@@ -9,21 +9,17 @@
 <body>
 <div data-role="page" data-theme="a">
     <div data-role="header" data-position="inline">
-        <div data-role="navbar">
-            <ul>
-                <li><a id="map-link" href="#" class="ui-btn-active">Map</a></li>
-                <li><a id="data-link" href="#">Data</a></li>
-            </ul>
-        </div>
+        <div id="banner">SightViewer</div>
     </div>
     <div id="content" data-role="content">
         <div id="map">
             <div id="olMap">
                 <div id="popup" title="Location Info"></div>
             </div>
-            <!--<div id="info-button" ></div>-->
-            <a id="locate-button" data-role="button">Locate Me!</a >
-            <a id="sync-button" data-role="button">Sync!</a >
+            <div id="button-section">
+                <a id="locate-button" data-role="button">Locate Me!</a>
+                <a id="sync-button" data-role="button">Sync!</a>
+            </div>
         </div>
     </div>
 </div>

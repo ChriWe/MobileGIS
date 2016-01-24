@@ -7,8 +7,7 @@ define('App', [
     'use strict';
 
     var options = {
-        map: {name: "map", template: undefined},
-        data: {name: "data", template: undefined}
+        map: {name: "map", template: undefined}
     };
 
     var initPage = options.map;

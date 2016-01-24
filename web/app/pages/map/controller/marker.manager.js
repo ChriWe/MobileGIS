@@ -10,34 +10,20 @@ define('MarkerManager', [
 ], function ($, m$, MarkerFactory, Marker) {
 
     var MarkerManager = function () {
-        var activeMarker;
+        var selectedMarker;
         var markers = [];
         var markerFactory = new MarkerFactory(this);
 
-
-        this.activeMarkerExists = function() {
-            if (activeMarker) {
-                return true
-            }
-            return false;
+        this.getSelectedMarker = function () {
+            return selectedMarker;
         };
 
-        this.getActiveMarker = function () {
-            return activeMarker;
-        };
-
-        this.removeActiveMarker = function () {
-            activeMarker.target.removeLayer(activeMarker.vectorLayer);
-        };
-
-        this.setActiveMarker = function (markerOptions) {
-            activeMarker = markerFactory.make(markerOptions);
-            activeMarker.target.addLayer(activeMarker.vectorLayer);
-            return activeMarker;
-        };
-
-        this.addMarker = function (marker) {
+        this.addMarker = function (markerOptions) {
+            var marker = markerFactory.make(markerOptions);
+            marker.target.addLayer(marker.vectorLayer);
             markers.push(marker);
+            selectedMarker = marker;
+            return marker;
         };
 
         this.removeMarker = function (marker) {
@@ -67,8 +53,12 @@ define('MarkerManager', [
             }
         };
 
-        this.openPopup = function (marker) {
-            marker.openPopup();
+        this.openPopup = function (marker, storeCallback) {
+            if (typeof storeCallback === "function") {
+                marker.openPopup(function(storeData) {
+                    storeCallback(storeData)
+                });
+            }
         };
 
         this.closePopup = function (marker) {

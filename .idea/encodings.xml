@@ -4,12 +4,13 @@
     <file url="file://$PROJECT_DIR$/web/app/app.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/index.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/main.js" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/web/app/pages/data/controller/database.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/data/view/data.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/database.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/map.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/marker.manager.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/overpass.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.factory.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.model.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/styles/map.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/view/map.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/vendor/bootstrap/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.js" charset="UTF-8" />
