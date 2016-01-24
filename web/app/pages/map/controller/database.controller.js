@@ -32,14 +32,12 @@ define('Database', [
     };
 
     Database.prototype.insertLocal = function(object){
-        object.id = UUID();
-
         var self = this;
-        self.serverDb
-            .get(object.id).catch(function (err){
+        self.browserDb
+            .get(object.id)
+            .catch(function (err){
                 if(err.status === 404){
-
-                    var localdoc = {
+                    return {
                         "_id": object.id,
                         "geometry": {
                             "type": "Point",
@@ -47,17 +45,10 @@ define('Database', [
                         },
                         "properties": object.data
                     };
-                    return self.browserDb.put(localdoc, function(err, result) {
-                        if (err) {
-                            console.log("Database error: " +  err)
-                        } else {
-                            console.log('da' + result)
-                        }
-                    });
                 }
             })
             .then(function(serverdoc) {
-                return self.serverDb.put({
+                return self.browserDb.put({
                     "_id": object.id,
                     "_rev": serverdoc._rev,
                     "geometry": {
@@ -95,7 +86,7 @@ define('Database', [
             });
     };
 
-    function UUID() {
+    Database.prototype.UUID= function() {
         var d = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (d + Math.random()*16)%16 | 0;
