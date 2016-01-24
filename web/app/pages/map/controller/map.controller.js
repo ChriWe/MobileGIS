@@ -12,7 +12,7 @@ define('Map', [
     "PouchDB",
     "Bootstrap",
     "Editable"
-], function ($, jqm, ol, Overpass, Database, MarkerManager) {
+], function ($, jqm, ol, Overpass, Database, MarkerManager, PouchDB) {
     'use strict';
 
     var markerManager = new MarkerManager();
@@ -113,6 +113,15 @@ define('Map', [
 
         // synchronize with database
         var syncBtn = document.getElementById('sync-button');
+        var syncOpt = {live: true, retry: true};
+        PouchDB.sync(db.browserDb,db.serverDb,syncOpt).on('change', function(info){
+            for(var i = 0; i < info.change.docs.length; i++){
+                if(info.change.docs[i]._deleted = true){
+                    var todelete = markerManager.getMarker(info.change.docs[i]._id);
+                    markerManager.removeMarker(todelete);
+                }
+            }
+        });
         syncBtn.addEventListener('click', function () {
             db.syncDB();
             db.browserDb.allDocs({
@@ -128,6 +137,7 @@ define('Map', [
                         target: map
                     };
                     var marker = markerManager.addMarker(markerOptions);
+
                 }
             })
 
