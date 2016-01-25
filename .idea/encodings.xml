@@ -10,8 +10,8 @@
     <file url="file://$PROJECT_DIR$/web/app/pages/map/controller/overpass.controller.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.factory.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/model/marker.model.js" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/web/app/pages/map/styles/map.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/pages/map/view/map.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/web/app/pages/map/view/styles/map.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/vendor/bootstrap/bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/vendor/jquery/jquery-1.12.0/jquery.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/web/app/vendor/jquery/jquery-1.12.0/jquery.min.js" charset="UTF-8" />

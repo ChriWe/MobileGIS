@@ -26,7 +26,7 @@ define('MarkerFactory', [
                     anchorXUnits: 'fraction',
                     anchorYUnits: 'pixels',
                     opacity: 0.75,
-                    src: 'pages/map/styles/images/icon.png'
+                    src: 'pages/map/view/styles/images/icon.png'
                 }))
             });
 

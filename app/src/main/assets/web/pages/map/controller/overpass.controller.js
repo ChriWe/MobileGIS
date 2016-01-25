@@ -43,7 +43,6 @@ define('Overpass', [
             var requestURL = baseURL + "interpreter?data=[out:json];relation[building=\"yes\"](" + bbox + ");out;";
             return request = $.getJSON(requestURL, function (data) {
             }).then(function (data) {
-                console.log(data);
                 // filtering the data
                 console.log(data);
                 var elements = data.elements;
@@ -96,9 +95,12 @@ define('Overpass', [
                         }
                     }
 
-                  return templates;
-                }
-                else {
+                    if (templates.length > 0) {
+                        return templates;
+                    } else {
+                        return [template];
+                    }
+                } else {
                     return [template];
                 }
             });
