@@ -1,0 +1,24 @@
+\BOOKMARK [0][-]{chapter.1}{Einleitung}{}% 1
+\BOOKMARK [1][-]{section.1.1}{Entwicklungsziele}{chapter.1}% 2
+\BOOKMARK [1][-]{section.1.2}{Methodik}{chapter.1}% 3
+\BOOKMARK [0][-]{chapter.2}{Technolien}{}% 4
+\BOOKMARK [1][-]{section.2.1}{Back-End}{chapter.2}% 5
+\BOOKMARK [2][-]{subsection.2.1.1}{Gradle}{section.2.1}% 6
+\BOOKMARK [2][-]{subsection.2.1.2}{WebView}{section.2.1}% 7
+\BOOKMARK [1][-]{section.2.2}{Front-End}{chapter.2}% 8
+\BOOKMARK [2][-]{subsection.2.2.1}{Grunt}{section.2.2}% 9
+\BOOKMARK [2][-]{subsection.2.2.2}{requireJS}{section.2.2}% 10
+\BOOKMARK [2][-]{subsection.2.2.3}{jQuery Mobile}{section.2.2}% 11
+\BOOKMARK [2][-]{subsection.2.2.4}{Bootstrap}{section.2.2}% 12
+\BOOKMARK [2][-]{subsection.2.2.5}{PouchDB}{section.2.2}% 13
+\BOOKMARK [2][-]{subsection.2.2.6}{Overpass}{section.2.2}% 14
+\BOOKMARK [0][-]{chapter.3}{Datemanagement}{}% 15
+\BOOKMARK [1][-]{section.3.1}{Datenmodel}{chapter.3}% 16
+\BOOKMARK [1][-]{section.3.2}{Prozess der Abfrage}{chapter.3}% 17
+\BOOKMARK [1][-]{section.3.3}{Prozess der Speicherung}{chapter.3}% 18
+\BOOKMARK [0][-]{chapter.4}{Implementierung}{}% 19
+\BOOKMARK [1][-]{section.4.1}{Projektstruktur und Assembling}{chapter.4}% 20
+\BOOKMARK [1][-]{section.4.2}{Architektur}{chapter.4}% 21
+\BOOKMARK [2][-]{subsection.4.2.1}{MVC-Pattern}{section.4.2}% 22
+\BOOKMARK [2][-]{subsection.4.2.2}{Anwendungs-Architektur}{section.4.2}% 23
+\BOOKMARK [0][-]{chapter.5}{Diskussion}{}% 24

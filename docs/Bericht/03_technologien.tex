@@ -1,0 +1,47 @@
+\chapter{Technolien}
+\label{chap:technologien}
+
+Im Rahmen der Implementierung der Anwendung werden eine Reihe von Frameworks und APIs verwendet um die Anwendungslogik effizient nach gängigen Patterns zu strukturieren. Dies ist besonders hilfreich, wenn man - wie auch im Enterpris-Umfeld - im Team an Projekten arbeitet. Die Teammitglieder können sich auf die Feature-Entwicklung konzentrieren und müssen sich nicht mit komplexen internen Anwendungsprozessen beschäftigen (e.g Templating-Engine), die bestimmte Frameworks out-of-the-box unterstützen.
+
+
+\section{Back-End}
+\label{sec:backend}
+Das Endprodukt soll eine hybride Android-Applikation sein. Da diese Applikation lediglich auf den GPS-Sensor des Smartphones zugreift und keine komplexen hardwarenahen Operationen ausführt, wird die WebView-API von Android verwendet. Aus diesem Grund müssen die Webinhalte von einem internen Assets-Ordner aus geladen werden. Dieser Prozess wird mittels des Build-Management-Tools Gradle automatisiert. 
+
+\subsection{Gradle}
+\label{subsec:gradle}
+Gradle ist ein auf Java basierendes Build-Management-Tool und wurde für Builds von Softwaresystemen entworfen. Besonders während der Entwicklungszeit werden sehr viele Änderungen am Quellcode vorgenommen, was eine ständiges Kopieren von neu erstellten Dateien in den Assets-Ordner bedeuten würde. Gradle ermöglicht es nur die Teile einer Software zu bauen, welche verändert wurden oder auf veränderten Teilen beruhen. Des weiteren können bestimmte Tasks angelegt werden, die beim Build parallel laufen (e.g. Tests). Resultat ist eine wesentlich höhere Geschwindigkeit beim Entwicklungsprozess.
+
+\subsection{WebView}
+\label{subsec:webview}
+Bei WebView handelt es sich um eine Java-Klasse, die das Rendering von Webinhalten ermöglicht. Es verwendet die WebKit rendering engine für die Darstellung und implementiert Basisfunktionen eines Webbrowsers.
+
+
+\section{Front-End}
+\label{sec:frontend}
+Während der Entwicklung werden die Vorteile von Web-Technologien ausgenützt. Anstatt jedes mal die Inhalte in die Android-Applikation zu laden und die Software dort zu testen, wird ein eigenes Submodul angelegt und das Front-End-Build-Management-Tool Grunt integriert. Des weiteren werden gängige APIs wie requireJS, jquery-mobile, bootstrap für die Anwendungslogig und Responsive-Design integriert. Für die Datenbankanbindung wird pouchDB und für die Abfrage von Geodaten wird ol3 integriert.
+
+\subsection{Grunt}
+\label{subsec:grunt}
+Grunt ist ein auf node.js basierender Taskrunner und ermöglicht es eine Vielzahl an Plugins zu Nutzen, die die Entwicklung vereinfachen und beschleunigen. Im Rahmen dieser Applikation wird speziellen von der Browser-Synchronisation Gebrauch gemacht. Dabei werden Änderungen im Quellcode sofort im Browser reflektiert. Die auszuführenden Tasks werden mittels einer zentralen Konfigurationsdatei (gruntfile.js) initialisiert. 
+
+\subsection{requireJS}
+\label{subsec:requirejs}
+Eine freie Javascript API für die Implementierung von asynchroner Moduldefinition (AMD). Dies ermöglicht die objektorientierte Codestrukturierung und das Laden der Dateien, wenn sie wirklich im Browser benötigt werden.
+
+\subsection{jQuery Mobile}
+\label{subsec:jquery}
+Eine freie Javascript API, die DOM-Navigation und - Manipulation speziell für mobile Anwendungen optimiert. Diese API wird im Rahmen der Applikation speziell für die Navigation und bestimmte Design-Elemente verwendet.
+
+\subsection{Bootstrap}
+\label{subsec:jquery}
+Eine freie Javascript API für die gezielte Manipulation von CSS-Elementen. Diese API wird im Rahmen der Applikation speziell für bestimmte Design-Elemente verwendet.
+
+\subsection{PouchDB}
+\label{subsec:pouchdb}
+Eine freie Javascript API die für die Ergänzung der CouchDB API zur Unterstützung von Offline-Funktionalitäten verwendet wird. Die API läuft im Browser und speichert die Dokumente im Web Storage des Browsers.
+
+\subsection{Overpass}
+\label{subsec:overpass}
+Eine freie Javascript API für die gezielte Abfrage von OpenStreetMap-Daten. Diese API wird im Rahmen der Applikation speziell für die Abfrage von Gebäudeattributen verwendet.
+
