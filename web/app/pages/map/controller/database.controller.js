@@ -5,14 +5,16 @@
 define('Database', [
     "jquery",
     "jqueryMobile",
+    "DatabaseModel",
     "PouchDB"
-],function($, m$, PouchDB){
+],function($, m$, DatabaseModel, PouchDB){
 
     console.log("database_controller");
 
     var Database = function() {
-        var dbName = "sighter";
-        var dbURL = "http://gi88.geoinfo.tuwien.ac.at:5984";
+        var dbModel = new DatabaseModel();
+        var dbName = dbModel.dbName;
+        var dbURL = dbModel.dbURL;
 
         this.getDBName = function () {
             return dbName;
@@ -86,7 +88,7 @@ define('Database', [
             });
     };
 
-    Database.prototype.UUID= function() {
+    Database.prototype.UUID = function() {
         var d = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             var r = (d + Math.random()*16)%16 | 0;
@@ -94,7 +96,7 @@ define('Database', [
             return (c=='x' ? r : (r&0x3|0x8)).toString(16);
         });
         return uuid;
-    }
+    };
 
     return Database;
 });

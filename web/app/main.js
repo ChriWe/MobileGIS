@@ -8,16 +8,19 @@ require.config({
         PouchDB: 'vendor/pouchdb/pouchdb-5.2.0/pouchdb-5.2.0.min',
         App: 'app',
         Map: 'pages/map/controller/map.controller',
+        MapModel: 'pages/map/model/map.model',
         Overpass: 'pages/map/controller/overpass.controller',
         Marker: 'pages/map/model/marker.model',
         MarkerFactory: 'pages/map/model/marker.factory',
         MarkerManager: 'pages/map/controller/marker.manager',
-        Database: 'pages/map/controller/database.controller'
+        Database: 'pages/map/controller/database.controller',
+        DatabaseModel: 'pages/map/model/database.model'
     },
     shim: {
         jqueryMobile: {deps: ['jquery']},
         Bootstrap: {deps: ['jquery']},
         Editable : { deps: ['jquery', 'Bootstrap'] },
+        MapModel: {deps: ['ol3']},
         Map: {deps: ['ol3']}
     }
 });

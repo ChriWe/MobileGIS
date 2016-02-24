@@ -8,11 +8,12 @@ define('Map', [
     "ol3",
     "Overpass",
     "Database",
+    "MapModel",
     "MarkerManager",
     "PouchDB",
     "Bootstrap",
     "Editable"
-], function ($, jqm, ol, Overpass, Database, MarkerManager, PouchDB) {
+], function ($, jqm, ol, Overpass, Database, MapModel, MarkerManager, PouchDB) {
     'use strict';
 
     var markerManager = new MarkerManager();
@@ -21,43 +22,7 @@ define('Map', [
     $(function () {
         console.log("map_controller");
 
-        var view = new ol.View({
-            center: ol.proj.transform([16, 48], 'EPSG:4326', 'EPSG:3857'),
-            zoom: 5
-        });
-        var myFormat = function (dgts) {
-            return (
-                function (coord1) {
-                    var coord2 = [coord1[1], coord1[0]];
-                    return ol.coordinate.toStringXY(coord2, dgts);
-                });
-        };
-        var mousePositionControl = new ol.control.MousePosition({
-            coordinateFormat: myFormat(3),
-            projection: 'EPSG:4326',
-            undefinedHTML: '&nbsp;',
-            target: document.getElementById('mouse-location')
-        });
-        var map = new ol.Map({
-            target: 'olMap',
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.MapQuest({layer: 'osm'})
-                }),
-                //new ol.layer.Tile({
-                //    source: new ol.source.MapQuest({layer: 'sat'})
-                //})
-            ],
-            view: view,
-            interactions: ol.interaction.defaults().extend([
-                new ol.interaction.DragRotateAndZoom()
-            ]),
-            controls: ol.control.defaults({
-                attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                    collapsible: false
-                })
-            }).extend([mousePositionControl])
-        });
+        var map = new MapModel('olMap');
 
         map.addEventListener('click', function (event) {
             var coord3857 = event.coordinate;
@@ -148,18 +113,6 @@ define('Map', [
 
         });
 
-        function connectionAvailable() {
-            $.ajaxSetup({async: false});
-            var re = "";
-            var r = Math.round(Math.random() * 10000);
-            $.get("http://google.com", {subins: r}, function (d) {
-                re = true;
-            }).error(function () {
-                re = false;
-            });
-            return re;
-        }
-
         // geolocate device
         var locateEnabled = false;
         var firstInit = false;
@@ -181,7 +134,7 @@ define('Map', [
 
         // Geolocation Control
         var geolocation = new ol.Geolocation(/** @type {olx.GeolocationOptions} */ ({
-            projection: view.getProjection(),
+            projection: map.getView().getProjection(),
             trackingOptions: {
                 //maximumAge: 10000,
                 enableHighAccuracy: true
