@@ -1,23 +1,25 @@
-\chapter{Datemanagement}
+\chapter{Datenmanagement}
 \label{chap:datenmanagement}
+Die in dieser Applikation benutzten Daten sind ausschließlich räumlich mit Bezug auf Gebäudeinformationen wie: Wer war der Architekt? Wie heißt das Gebäude? ...  
+Es dienen die hinterlegten Daten von OSM, welche mittels der Overpass API abgefragt werden, als Grundlage der gewünschten Informationen. Zusätzlich hat der Benutzer die Möglichkeit weitere Fakten hinzuzufügen.
 
-INTRO
+Um die Daten nicht jedes mal neu abfragen zu müssen, bzw. um sie auch Offline benutzen zu können, wird im Hintergrund eine Datenbank hinterlegt. Im weiteren handelt es sich um die zuvor erwähnte CouchDB, welche anders als RDBMS über Dokumente realisiert ist. Alle abgefragten und geänderten Daten werden lokal gespeichert und bei aktiver Internetverbindungen mit einer Datenbank auf dem TUWien CouchDB-Server synchronisiert und auf alle verbundenen Clients verteilt.
 
-\section{Datenmodel}
+\section{Datenmodell}
 \label{sec:datenmodel}
+Jeder neue Eintrag (Dokument) in der Datenbank bekommt eine vom Client aus erzeugte UUID, welche mittels Datumsstempel und Zufallszahl generiert wird. Diese dient als Primarykey um Dokumente zu erfassen. 
+Um Konflikte beheben zu können, fügt CouchDB zusätzlich eine sogenannte '_rev' ein. Diese zeigt an in welcher Revision sich das gerade editierte Dokument handelt und verlangt, bei einem etwaigen Konflikt, entweder nach einer Konfliktlösung oder wählt per Zufall aus welches Dokument das 'richtige' ist. Das verworfene Dokumente werden jedoch gespeichert um im Nachhinein weitere Entscheidungen treffen zu können.
 
-Wie schaut unser Datenmodell am client aus.
-Wie schaut unser Datenmodell in coouchdb aus
+Geometriedaten (x-y Koordinaten) werden sowie die Eigenschaften der Gebäude in einem gesonderten Feld gespeichert. Zu den Gebäudeeigenschaften zählen: Name, Beschreibung in Englisch, Beschreibung in Deutsch, Name des Architekten und eine URL (z.B. zu einem Wikipediaeintrag).
 
-Wie schaut das Mapping aus?
 
 \section{Prozess der Abfrage}
 \label{sec:abfrage}
-welche prozesse werden durchlaufen
+Beim ersten Start der Applikation wird, bei vorhandener Internetverbindung, die ServerDB mit der LokalenDB abgeglichen. Dieser Handshake findet bei jeder Änderung der ServerDB sowie LokalenDB statt, solange eine Verbindung vorhanden ist. Es werden sowohl neue, wie geänderte, als auch gelöschte Ereignisse synchronisiert.
 
 \section{Prozess der Speicherung}
 \label{sec:speicherung}
-welche prozesse werden durchlaufen
+Geladen Daten sowie abgefragte Daten via Overpass werden wie vorhin erwähnt abgespeichert bzw. mit eine UUID und _rev Nummer versehen. Beim ändern eines Datensatzes muss die _rev Nummer der Datenbank zuvor abgefragt werden, da diese elementarer Bestandteil der Synchronisation ist. Jede Veränderung erhört die _rev Nummer um 1 und legt den Datensatz zurück auf die LokaleDB (hier wieder die sofortige Synchronisation mit der ServerDB falls das Gerät online ist).
 
 
 % BSP FÜR LADEN EINES BILDES
