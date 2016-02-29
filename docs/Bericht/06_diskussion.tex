@@ -1,4 +1,18 @@
 \chapter{Diskussion}
 \label{sec:diskussion}
+Die Anwendung soll folgende Eigenschaften vorweisen:
+\begin{itemize}
+\item Mobile Applikation für ein Smartphone
+\item Implementierung einer dokumentenbasierten Datenbank
+\item Verwendung ein oder mehrerer Sensoren des Smartphones
+\item Heranziehen einer externen API
+\end{itemize}
 
+Weixi hier kurz hinschreiben wie die app zamgestöpselt is ... ich checks immernoch nicht ganz
+
+Die gesamten erhobenen und gesammelten Daten werden sowohl lokal als auch am online gespeichert. Die Struktur der verwendeten Datenbank ist mittels Dokumente aufgebaut, jeder Eintrag entspricht ein Dokument. Hierfür wird CouchDB verwendet, welche vom Institut zu Verfügung gestellt wird. PouchDB wird auf der Clientseite verwendet und stellt auch das Bindeglied zwischen lokal und Server da.
+
+Zur Verwendung an Hardwareressourcen kommt das GPS-Modul. Die ursprüngliche Idee auch das Gyroskop zu verwenden, um Gebäude die direkt vor dem Gerät sind per Richtung zu erkennen, wurde verworfen. GPS ermöglicht es die Position in ausreichender Genauigkeit zu bestimmen um händisch Gebäude in der Umgebung auswählen zu können.
+
+Die Informationen der Gebäude stammen von der Opensourcecommunity OpenStreetMap und wird mittels Overpass API erreicht. Overpass benötigt einen definierten Bereich um Informationen innerhalb des Bereiches zu erlangen. Diese werden noch nach Art und gewollten Eigenschaften gefiltert und anschließen auf der Karte angezeigt und lokal gespeichert, sowie bei aktiver Onlineverbindung mit dem Server synchronisiert.
  
